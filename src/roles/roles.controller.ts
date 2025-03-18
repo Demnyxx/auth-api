@@ -14,9 +14,11 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { JwtAuthGuard } from 'src/users/auth.guard';
 import { RolesGuard } from 'src/users/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 // Décorateur personnalisé pour spécifier des rôles
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+@ApiBearerAuth()
 @Roles('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('roles')

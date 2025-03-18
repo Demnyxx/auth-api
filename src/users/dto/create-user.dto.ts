@@ -15,6 +15,9 @@ export class CreateUserDto {
   @IsOptional()
   password: string;
 
+  /**
+   * ID du rôle à attribuer à l'utilisateur
+   */
   @IsUUID()
   roleId: string;
 }

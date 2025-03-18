@@ -14,6 +14,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
+import { ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
+import { LoginDto } from './dto/login.dto';
 
 // Décorateur personnalisé pour spécifier des rôles
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
@@ -22,20 +24,33 @@ export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * Créer un nouvel utilisateur
+   *
+   * @throws {401} Unauthorized.
+   * @throws {403} Droits insuffisants.
+   */
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Post()
+  @ApiBearerAuth()
+  @ApiCreatedResponse({
+    description: 'Utilisateur créé avec succès.',
+  })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.register(createUserDto);
   }
 
   @Post('login')
-  async login(
-    @Body() { email, password }: { email: string; password: string },
-  ) {
-    return this.usersService.login(email, password);
+  @ApiCreatedResponse({
+    description: 'Utilisateur connecté avec succès.',
+  })
+  async login(@Body() loginDto: LoginDto) {
+    return this.usersService.login(loginDto);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Get()
@@ -43,6 +58,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Get(':id')
@@ -50,6 +66,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Patch(':id')
@@ -57,6 +74,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete(':id')

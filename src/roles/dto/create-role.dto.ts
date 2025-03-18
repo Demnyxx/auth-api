@@ -9,6 +9,9 @@ export class CreateRoleDto {
   @IsOptional()
   description?: string;
 
+  /**
+   * Tableau contenant les IDs des permissions à assigner au rôle
+   */
   @IsOptional()
   @IsArray()
   permissions?: Array<string>;

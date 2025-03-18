@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class UsersService {
@@ -37,13 +38,11 @@ export class UsersService {
       },
     });
 
-    return {
-      user: user,
-      token: this.generateToken(user)['accessToken'],
-    };
+    return user;
   }
 
-  async login(email: string, password: string) {
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {

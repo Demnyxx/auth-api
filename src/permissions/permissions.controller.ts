@@ -14,10 +14,12 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { JwtAuthGuard } from 'src/users/auth.guard';
 import { RolesGuard } from 'src/users/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 // Décorateur personnalisé pour spécifier des rôles
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 
+@ApiBearerAuth()
 @Roles('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('permissions')
