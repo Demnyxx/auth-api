@@ -8,7 +8,22 @@ export class RolesService {
   constructor(private prisma: PrismaService) {}
 
   create(createRoleDto: CreateRoleDto) {
-    return this.prisma.role.create({ data: createRoleDto });
+    const { nom, description } = createRoleDto;
+    let permissions = createRoleDto['permissions'];
+    if (permissions === undefined) {
+      permissions = [];
+    }
+    return this.prisma.role.create({
+      data: {
+        nom,
+        description,
+        rolePermissions: {
+          create: permissions.map((permissionId) => ({
+            permission: { connect: { id: permissionId } },
+          })),
+        },
+      },
+    });
   }
 
   findAll() {
@@ -24,10 +39,30 @@ export class RolesService {
     return permission;
   }
 
-  update(id: string, updateRoleDto: UpdateRoleDto) {
+  async update(id: string, updateRoleDto: UpdateRoleDto) {
+    const { nom, description, permissions } = updateRoleDto;
+    if (permissions !== undefined && permissions.length > 0) {
+      // Delete existing permissions for the role
+      await this.prisma.rolePermission.deleteMany({
+        where: { roleId: id },
+      });
+
+      // Add new permissions
+      await this.prisma.role.update({
+        where: { id: id },
+        data: {
+          rolePermissions: {
+            create: permissions.map((permissionId) => ({
+              permission: { connect: { id: permissionId } },
+            })),
+          },
+        },
+      });
+    }
+
     return this.prisma.role.update({
       where: { id },
-      data: updateRoleDto,
+      data: { nom, description },
     });
   }
 

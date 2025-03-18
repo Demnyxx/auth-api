@@ -6,11 +6,19 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { JwtAuthGuard } from 'src/users/auth.guard';
+import { RolesGuard } from 'src/users/roles.guard';
 
+// Décorateur personnalisé pour spécifier des rôles
+export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+@Roles('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}

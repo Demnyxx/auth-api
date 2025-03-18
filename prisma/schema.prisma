@@ -13,7 +13,8 @@ model User {
   password      String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  userRoles     UserRole[]
+  role     Role             @relation(fields: [roleId], references: [id])
+  roleId String
 }
 
 model Role {
@@ -21,7 +22,7 @@ model Role {
   nom            String              @unique
   description     String?
   rolePermissions RolePermission[]
-  userRoles       UserRole[]
+  users User[]
 }
 
 model Permission {
@@ -37,12 +38,4 @@ model RolePermission {
   role         Role       @relation(fields: [roleId], references: [id])
   permission   Permission @relation(fields: [permissionId], references: [id])
   @@id([roleId, permissionId])
-}
-
-model UserRole {
-  userId String
-  roleId String
-  user   User @relation(fields: [userId], references: [id])
-  role   Role @relation(fields: [roleId], references: [id])
-  @@id([userId, roleId])
 }
